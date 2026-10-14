@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>Windows 11 Update Failure — Simulation</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #000; color: #fff; }
+    body { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-weight: 400; -webkit-font-smoothing: antialiased; }
+    [hidden] { display: none !important; }
+    main { min-height: 100svh; display: grid; place-items: center; padding: 32px 24px 90px; }
+    .status { text-align: center; width: min(100%, 800px); transform: translateY(25px); }
+    .spinner { width: 34px; height: 34px; margin: 0 auto 31px; border: 3px solid #ffffff18; border-top-color: #fff; border-right-color: #fff; border-radius: 50%; animation: spin 1.2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    p { margin: 0; font-size: clamp(17px, 1.65vw, 22px); line-height: 1.55; }
+    .percent { font-variant-numeric: tabular-nums; }
+    .footnote { position: fixed; left: 24px; right: 24px; bottom: 12%; text-align: center; font-size: clamp(14px, 1.2vw, 16px); color: #efefef; }
+    .logo { position: fixed; top: 33%; left: 50%; transform: translate(-50%, -50%); display: grid; grid-template-columns: repeat(2, 48px); gap: 5px; }
+    .logo i { width: 48px; height: 48px; background: #00a2ed; }
+    body.booting .status { position: fixed; top: 65%; left: 0; width: 100%; transform: none; }
+    .controls { position: fixed; right: 20px; bottom: 17px; left: 20px; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 12px; opacity: 0; transition: opacity .2s; }
+    body.controls-visible .controls, .controls:hover, .controls:focus-within { opacity: 1; }
+    button { color: #fff; background: #181818; border: 1px solid #ffffff65; border-radius: 3px; padding: 7px 12px; font: inherit; cursor: pointer; }
+    button:hover { background: #303030; }
+    button:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .controls { transition: none; } }
+  </style>
+</head>
+<body class="controls-visible">
+  <main aria-label="Windows update simulation">
+    <div class="logo" id="logo" aria-hidden="true" hidden><i></i><i></i><i></i><i></i></div>
+    <div class="status">
+      <div class="spinner" aria-hidden="true"></div>
+      <div id="message" role="status" aria-live="polite"></div>
+    </div>
+    <p class="footnote" id="footnote">Your PC may restart a few times</p>
+  </main>
+  <div class="controls" aria-label="Simulation controls">
+    <span>Simulation</span>
+    <button id="skip" type="button">Skip to failure</button>
+    <button id="replay" type="button">Replay update</button>
+    <button id="fullscreen" type="button">Fullscreen</button>
+  </div>
+  <script>
+    const message = document.getElementById('message');
+    const logo = document.getElementById('logo');
+    const footnote = document.getElementById('footnote');
+    const skip = document.getElementById('skip');
+    let timers = [];
+    function clearSequence() {
+      timers.forEach(window.clearTimeout);
+      timers = [];
+    }
+    function schedule(callback, delay) { timers.push(window.setTimeout(callback, delay)); }
+    function undoChanges() {
+      clearSequence();
+      document.body.classList.remove('booting');
+      logo.hidden = true;
+      footnote.hidden = true;
+      skip.hidden = true;
+      message.innerHTML = '<p>Something didn’t go as planned.</p><p>No need to worry—undoing changes.</p><p>Please keep your computer on.</p>';
+      // Remain here indefinitely. No navigation, reboot, or system changes.
+    }
+    function restart() {
+      document.body.classList.add('booting');
+      logo.hidden = false;
+      footnote.hidden = true;
+      message.innerHTML = '';
+      schedule(undoChanges, 3200);
+    }
+    function start() {
+      clearSequence();
+      document.body.classList.remove('booting');
+      logo.hidden = true;
+      footnote.hidden = false;
+      skip.hidden = false;
+      message.innerHTML = '<p>Working on updates</p><p><span class="percent" id="percent">0</span>% complete.</p><p>Please keep your computer on.</p>';
+      const steps = [[1800, 3], [3800, 7], [6000, 12], [8500, 18], [11000, 23], [14500, 27], [18500, 30]];
+      steps.forEach(([delay, percent]) => schedule(() => {
+        document.getElementById('percent').textContent = percent;
+      }, delay));
+      schedule(() => {
+        message.innerHTML = '<p>Restarting</p>';
+        footnote.hidden = true;
+      }, 21500);
+      schedule(restart, 23000);
+    }
+    skip.addEventListener('click', undoChanges);
+    document.getElementById('replay').addEventListener('click', start);
+    const fullscreen = document.getElementById('fullscreen');
+    if (!document.fullscreenEnabled) fullscreen.hidden = true;
+    fullscreen.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch { fullscreen.textContent = 'Fullscreen unavailable'; }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      fullscreen.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+    });
+    let hideControls;
+    function revealControls() {
+      document.body.classList.add('controls-visible');
+      clearTimeout(hideControls);
+      hideControls = setTimeout(() => document.body.classList.remove('controls-visible'), 2400);
+    }
+    document.addEventListener('pointermove', revealControls);
+    document.addEventListener('pointerdown', revealControls);
+    revealControls();
+    start();
+  </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>MS-DOS Blinking Cursor — Simulation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #000; color: #aaa; }
+  body { font: clamp(14px, 1.65vw, 22px)/1.2 'Courier New', Courier, monospace; }
+  main { min-height: 100svh; padding: 12px 16px; }
+  pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+  .cursor { display: inline-block; width: .62em; height: .16em; background: #aaa; vertical-align: baseline; animation: blink .8s steps(1, end) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+</style>
+</head>
+<body>
+<main aria-label="Simulated MS-DOS boot ending at an idle cursor">
+  <pre id="output">Starting MS-DOS...
+
+</pre><span id="cursor" class="cursor" aria-hidden="true" hidden></span>
+</main>
+<script>
+  const output = document.getElementById('output');
+  function append(text) { output.textContent += text; }
+  const sequence = [
+    [650, () => append('HIMEM is testing extended memory...')],
+    [1550, () => append('done.\n\n')],
+    [2000, () => append('C:\\>C:\\DOS\\SMARTDRV.EXE /X\n')],
+    [2400, () => append('C:\\>PROMPT $p$g\n')],
+    [2750, () => append('C:\\>PATH C:\\DOS\n')],
+    [3100, () => append('C:\\>SET TEMP=C:\\DOS\n')],
+    [3500, () => append('C:\\>CLS\n')],
+    [3800, () => {
+      output.hidden = true;
+      document.getElementById('cursor').hidden = false;
+      // End here permanently: only the CSS cursor animation continues.
+    }]
+  ];
+  sequence.forEach(([delay, action]) => setTimeout(action, delay));
+</script>
+</body>
+</html>

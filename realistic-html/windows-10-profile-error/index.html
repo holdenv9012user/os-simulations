@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>Windows 10 Sign-in — Simulation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #000; color: white; }
+  body { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  [hidden] { display: none !important; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible { outline: 2px solid white; outline-offset: 5px; }
+  .screen { min-height: 100svh; }
+  #boot { position: relative; }
+  .boot-logo { position: absolute; top: 33%; left: 50%; transform: translate(-50%, -50%); width: 105px; height: 105px; color: #00a4ef; }
+  .spinner { position: relative; width: 34px; height: 34px; }
+  .spinner i { position: absolute; inset: 0; animation: orbit 2.4s cubic-bezier(.35, .05, .3, .95) infinite; }
+  .spinner i::after { content: ''; position: absolute; width: 4px; height: 4px; border-radius: 50%; background: white; left: 15px; top: 0; }
+  .spinner i:nth-child(2) { animation-delay: -.16s; }
+  .spinner i:nth-child(3) { animation-delay: -.32s; }
+  .spinner i:nth-child(4) { animation-delay: -.48s; }
+  .spinner i:nth-child(5) { animation-delay: -.64s; }
+  @keyframes orbit { 0% { transform: rotate(0); opacity: 0; } 12% { opacity: 1; } 85% { opacity: 1; } 100% { transform: rotate(720deg); opacity: 0; } }
+  #boot > .spinner { position: absolute; top: 65%; left: calc(50% - 17px); }
+  #login { position: relative; overflow: hidden; display: grid; place-items: center; padding: 65px 24px 125px; background: radial-gradient(ellipse at 76% 48%, #057ec0 0%, #00477a 37%, #001c3a 72%, #001025 100%); isolation: isolate; }
+  .wallpaper { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
+  .beam { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 8%, #009cff16 46%, #32ceff55 76%, transparent 88%); clip-path: polygon(0 7%, 79% 35%, 79% 69%, 0 100%); filter: blur(16px); }
+  .window { position: absolute; top: 31%; left: 66%; width: 22%; height: 37%; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; transform: perspective(700px) rotateY(-22deg); filter: blur(1px); }
+  .window span { border: 2px solid #87eaffb0; background: linear-gradient(120deg, #0ca2e9a0, #0792d140); box-shadow: 0 0 22px #02c1ff80, inset 0 0 28px #00afff70; }
+  .wallpaper::after { content: ''; position: absolute; inset: 0; background: #00172d66; backdrop-filter: blur(5px); }
+  .account { text-align: center; width: min(100%, 650px); }
+  .avatar { width: 190px; height: 190px; border-radius: 50%; background: #d0d6dc42; display: grid; place-items: center; margin: 0 auto 22px; }
+  .avatar svg { width: 134px; height: 134px; fill: none; stroke: #fff; stroke-width: 2.5; }
+  h1 { margin: 0 0 25px; font-size: 44px; font-weight: 300; line-height: 1.2; }
+  .signin { min-width: 130px; padding: 8px 25px; border: 2px solid #ffffff9c; background: #ffffff25; font-size: 18px; }
+  .signin:hover { background: #ffffff40; border-color: white; }
+  .welcome { display: flex; justify-content: center; align-items: center; gap: 17px; font-size: 23px; font-weight: 300; }
+  .error { max-width: 640px; margin: 0 auto; }
+  .error p { margin: 0 0 25px; font-size: 21px; line-height: 1.5; font-weight: 300; }
+  .error button { min-width: 170px; padding: 9px 24px; background: #ffffff25; border: 2px solid #ffffff9c; font-size: 17px; }
+  .error button:hover { background: #ffffff40; }
+  .system-icons { position: absolute; bottom: 65px; right: 40px; display: flex; align-items: center; gap: 25px; color: #fff; }
+  .system-icons svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .account-label { position: absolute; left: 38px; bottom: 65px; display: flex; align-items: center; gap: 13px; font-size: 16px; }
+  .mini-avatar { width: 40px; height: 40px; border-radius: 50%; background: #ffffff30; display: grid; place-items: center; }
+  .mini-avatar svg { width: 30px; height: 30px; fill: none; stroke: white; stroke-width: 2; }
+  .controls { position: fixed; bottom: 15px; right: 20px; left: 20px; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 12px; opacity: 0; transition: opacity .2s; }
+  .controls-visible .controls, .controls:hover, .controls:focus-within { opacity: 1; }
+  .controls button { background: #152535; border: 1px solid #ffffff60; padding: 7px 11px; border-radius: 3px; }
+  @media (max-width: 600px) { .avatar { width: 145px; height: 145px; } .avatar svg { width: 105px; height: 105px; } h1 { font-size: 36px; } .error p { font-size: 18px; } .window { left: 45%; width: 48%; } .account-label { left: 24px; bottom: 95px; } .system-icons { right: 24px; bottom: 100px; } }
+  @media (prefers-reduced-motion: reduce) { .spinner i { animation: none; transform: rotate(0); } .spinner i:nth-child(2) { transform: rotate(45deg); } .spinner i:nth-child(3) { transform: rotate(90deg); } .spinner i:nth-child(4) { transform: rotate(135deg); } .spinner i:nth-child(5) { transform: rotate(180deg); } .controls { transition: none; } }
+</style>
+</head>
+<body class="controls-visible">
+<section class="screen" id="boot" aria-label="Simulated Windows 10 boot">
+  <svg class="boot-logo" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor" d="M0 14 43 8v39H0zm49-7L100 0v47H49zM0 53h43v39L0 86zm49 0h51v47l-51-7z"/></svg>
+  <div class="spinner" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+</section>
+<main class="screen" id="login" hidden>
+  <div class="wallpaper" aria-hidden="true"><div class="beam"></div><div class="window"><span></span><span></span><span></span><span></span></div></div>
+  <div class="account">
+    <div class="avatar" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="50" cy="33" r="18"/><path d="M15 88v-7c0-19 16-30 35-30s35 11 35 30v7"/></svg></div>
+    <h1>User</h1>
+    <button class="signin" id="signin" type="button">Sign in</button>
+    <div class="welcome" id="welcome" role="status" hidden><div class="spinner" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><span>Welcome</span></div>
+    <div class="error" id="error" hidden>
+      <p role="alert">The User Profile Service service failed the sign-in.<br>User profile cannot be loaded.</p>
+      <button id="okay" type="button">OK</button>
+    </div>
+  </div>
+  <div class="account-label" aria-hidden="true"><span class="mini-avatar"><svg viewBox="0 0 100 100"><circle cx="50" cy="33" r="18"/><path d="M15 88v-7c0-19 16-30 35-30s35 11 35 30v7"/></svg></span>User</div>
+  <div class="system-icons" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M3 4h18v12H3zM12 16v5M7 21h10"/></svg>
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M4 8h16M12 6v8m0-3-6 10m6-10 6 10"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M12 2v10M6 5a9 9 0 1 0 12 0"/></svg>
+  </div>
+</main>
+<div class="controls" aria-label="Simulation controls"><span>Simulation</span><button id="skip" type="button">Skip boot</button><button id="replay" type="button">Replay boot</button><button id="fullscreen" type="button">Fullscreen</button></div>
+<script>
+  const boot = document.getElementById('boot');
+  const login = document.getElementById('login');
+  const signin = document.getElementById('signin');
+  const welcome = document.getElementById('welcome');
+  const error = document.getElementById('error');
+  const okay = document.getElementById('okay');
+  const skip = document.getElementById('skip');
+  let sequenceTimer;
+  function showLogin(focus = false) {
+    clearTimeout(sequenceTimer);
+    boot.hidden = true;
+    login.hidden = false;
+    signin.hidden = false;
+    welcome.hidden = true;
+    error.hidden = true;
+    skip.hidden = true;
+    if (focus) signin.focus();
+  }
+  function startBoot() {
+    clearTimeout(sequenceTimer);
+    boot.hidden = false;
+    login.hidden = true;
+    skip.hidden = false;
+    sequenceTimer = setTimeout(() => showLogin(), 4200);
+  }
+  signin.addEventListener('click', () => {
+    signin.hidden = true;
+    welcome.hidden = false;
+    sequenceTimer = setTimeout(() => {
+      welcome.hidden = true;
+      error.hidden = false;
+      okay.focus();
+    }, 1600);
+  });
+  okay.addEventListener('click', () => showLogin(true));
+  skip.addEventListener('click', () => showLogin(true));
+  document.getElementById('replay').addEventListener('click', startBoot);
+  const fullscreen = document.getElementById('fullscreen');
+  if (!document.fullscreenEnabled) fullscreen.hidden = true;
+  fullscreen.addEventListener('click', async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
+    } catch { fullscreen.textContent = 'Fullscreen unavailable'; }
+  });
+  document.addEventListener('fullscreenchange', () => fullscreen.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen');
+  let controlsTimer;
+  function reveal() {
+    document.body.classList.add('controls-visible');
+    clearTimeout(controlsTimer);
+    controlsTimer = setTimeout(() => document.body.classList.remove('controls-visible'), 2400);
+  }
+  document.addEventListener('pointermove', reveal);
+  document.addEventListener('pointerdown', reveal);
+  reveal();
+  startBoot();
+</script>
+</body>
+</html>

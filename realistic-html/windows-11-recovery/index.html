@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>Windows 11 Recovery — Simulation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: #000; color: #fff; font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-weight: 300; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible { outline: 3px solid white; outline-offset: 5px; }
+  #boot { height: 100svh; min-height: 400px; position: relative; }
+  .logo { position: absolute; top: 33%; left: 50%; transform: translate(-50%, -50%); display: grid; grid-template-columns: repeat(2, 49px); gap: 5px; }
+  .logo i { width: 49px; height: 49px; background: #00a2ed; }
+  .loading { position: absolute; top: 65%; left: 0; width: 100%; text-align: center; }
+  .spinner { width: 33px; height: 33px; margin: 0 auto 24px; border: 3px solid #ffffff20; border-top-color: white; border-right-color: white; border-radius: 50%; animation: spin 1.15s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #boot-message { font-size: 18px; min-height: 24px; }
+  #recovery { min-height: 100svh; padding: clamp(45px, 8vh, 90px) clamp(28px, 8vw, 125px) 100px; background: #0078d7; }
+  [hidden] { display: none !important; }
+  header { display: flex; align-items: center; gap: 25px; margin-bottom: 36px; }
+  h1 { font-size: clamp(34px, 4.2vw, 58px); line-height: 1.15; font-weight: 300; margin: 0; }
+  .back { flex: 0 0 36px; height: 36px; background: transparent; border: 2px solid white; border-radius: 50%; font-size: 25px; line-height: 25px; padding: 0; }
+  .intro { font-size: 20px; line-height: 1.55; max-width: 900px; margin: 0 0 22px; }
+  .small { font-size: 15px; line-height: 1.6; max-width: 900px; overflow-wrap: anywhere; }
+  .actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 44px; }
+  .action { background: transparent; border: 2px solid #ffffffb0; padding: 10px 26px; font-size: 17px; }
+  .action:hover { background: #ffffff20; border-color: white; }
+  .tiles { display: grid; grid-template-columns: repeat(2, minmax(280px, 440px)); gap: 12px 25px; max-width: 940px; }
+  .tile { display: flex; text-align: left; align-items: center; gap: 22px; padding: 14px; min-height: 116px; border: 2px solid transparent; background: transparent; }
+  .tile:hover { border-color: white; background: #ffffff0c; }
+  .icon { flex: 0 0 76px; width: 76px; height: 76px; display: grid; place-items: center; border: 2px solid white; }
+  .icon svg { width: 43px; height: 43px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .tile strong { display: block; font-size: 24px; font-weight: 400; margin-bottom: 5px; }
+  .tile small { display: block; font-size: 15px; line-height: 1.4; font-weight: 300; }
+  .controls { position: fixed; bottom: 16px; right: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 12px; opacity: 0; transition: opacity .2s; z-index: 5; }
+  body.controls-visible .controls, .controls:hover, .controls:focus-within { opacity: 1; }
+  .controls button { background: #222; border: 1px solid #ffffff70; border-radius: 3px; padding: 7px 11px; }
+  .terminal { background: #0c0c0c; font: 16px/1.6 Consolas, monospace; padding: 24px; max-width: 950px; min-height: 260px; white-space: pre-wrap; }
+  @media (max-width: 740px) { .tiles { grid-template-columns: 1fr; } #recovery { padding-top: 45px; } header { gap: 16px; } .tile { padding-left: 0; } .controls { left: 20px; } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } .controls { transition: none; } }
+</style>
+</head>
+<body class="controls-visible">
+<section id="boot" aria-label="Simulated Windows boot">
+  <div class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="loading"><div class="spinner" aria-hidden="true"></div><div id="boot-message" role="status"></div></div>
+</section>
+<main id="recovery" hidden></main>
+<div class="controls">
+  <span>Simulation</span>
+  <button id="skip">Skip to recovery</button>
+  <button id="restart">Replay boot</button>
+  <button id="fullscreen">Fullscreen</button>
+</div>
+<script>
+const boot = document.querySelector('#boot');
+const recovery = document.querySelector('#recovery');
+const message = document.querySelector('#boot-message');
+const skip = document.querySelector('#skip');
+let timers = [];
+function cancelTimers() { timers.forEach(clearTimeout); timers = []; }
+function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+const paths = {
+  arrow: '<path d="M7 24h34M29 12l12 12-12 12"/>',
+  power: '<path d="M24 5v20M14 11a17 17 0 1 0 20 0"/>',
+  tools: '<path d="m10 7 7 7-4 4-7-7a10 10 0 0 0 12 13l15 16a5 5 0 0 0 7-7L24 18A10 10 0 0 0 10 7Z"/>',
+  drive: '<path d="M6 13h36v25H6zM6 29h36M32 34h4M12 8h24"/>',
+  restore: '<path d="M9 16a17 17 0 1 1-1 17M9 6v11h11M24 14v11l8 5"/>',
+  terminal: '<path d="M4 8h40v32H4zM10 17l7 7-7 7M23 32h12"/>',
+  settings: '<path d="M7 13h34M7 24h34M7 35h34M16 8v10M32 19v10M20 30v10"/>',
+  uninstall: '<path d="M8 9h32v31H8zM8 17h32M18 25l12 9M30 25l-12 9"/>',
+};
+function tile(title, detail, icon, action) {
+  return `<button class="tile" data-action="${action}"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48">${paths[icon]}</svg></span><span><strong>${title}</strong><small>${detail}</small></span></button>`;
+}
+function action(label, id) { return `<button class="action" data-action="${id}">${label}</button>`; }
+function show(title, content, back) {
+  cancelTimers(); boot.hidden = true; recovery.hidden = false; skip.hidden = true;
+  document.querySelector('meta[name="theme-color"]').content = '#0078d7';
+  recovery.innerHTML = `<header>${back ? `<button class="back" data-action="${back}" aria-label="Back">←</button>` : ''}<h1 tabindex="-1">${title}</h1></header>${content}`;
+  recovery.querySelector('h1').focus({ preventScroll: true });
+}
+function failure() {
+  show('Automatic Repair', `<p class="intro">Your PC did not start correctly</p><p class="small">Press “Restart” to restart your PC, which can sometimes fix the problem. You can also press “Advanced options” to try other options to repair your PC.</p><div class="actions">${action('Restart', 'restart')}${action('Advanced options', 'choose')}</div>`);
+}
+function choose() {
+  show('Choose an option', `<div class="tiles">${tile('Continue', 'Exit and continue to Windows 11', 'arrow', 'restart')}${tile('Use a device', 'Use a USB drive, network connection, or Windows recovery DVD', 'drive', 'device')}${tile('Troubleshoot', 'Reset your PC or see advanced options', 'tools', 'troubleshoot')}${tile('Turn off your PC', '', 'power', 'off')}</div>`);
+}
+function troubleshoot() {
+  show('Troubleshoot', `<div class="tiles">${tile('Reset this PC', 'Lets you choose to keep or remove your personal files, and then reinstalls Windows', 'restore', 'reset')}${tile('Advanced options', '', 'tools', 'advanced')}</div>`, 'choose');
+}
+function advanced() {
+  show('Advanced options', `<div class="tiles">${tile('Startup Repair', 'Fix problems that keep Windows from loading', 'tools', 'repair')}${tile('Startup Settings', 'Change Windows startup behavior', 'settings', 'startup')}${tile('Command Prompt', 'Use the Command Prompt for advanced troubleshooting', 'terminal', 'command')}${tile('Uninstall Updates', 'Remove recently installed quality or feature updates from Windows', 'uninstall', 'updates')}${tile('UEFI Firmware Settings', 'Change settings in your PC’s UEFI firmware', 'settings', 'firmware')}${tile('System Restore', 'Use a restore point recorded on your PC to restore Windows', 'restore', 'restore')}</div>`, 'troubleshoot');
+}
+function startBoot(repairOnly = false) {
+  cancelTimers(); recovery.hidden = true; boot.hidden = false; skip.hidden = false;
+  document.querySelector('meta[name="theme-color"]').content = '#000000';
+  message.textContent = repairOnly ? 'Diagnosing your PC' : '';
+  if (repairOnly) {
+    later(() => message.textContent = 'Attempting repairs', 3000);
+    later(() => show('Startup Repair', `<p class="intro">Startup Repair couldn’t repair your PC</p><p class="small">Press “Advanced options” to try other options to repair your PC or “Shut down” to turn off your PC.</p><p class="small">Log file: C:\\WINDOWS\\System32\\Logfiles\\Srt\\SrtTrail.txt</p><div class="actions">${action('Shut down', 'off')}${action('Advanced options', 'advanced')}</div>`), 8500);
+  } else {
+    later(() => message.textContent = 'Preparing Automatic Repair', 4000);
+    later(() => message.textContent = 'Diagnosing your PC', 8500);
+    later(failure, 13500);
+  }
+}
+const routes = {
+  restart: () => startBoot(), choose, troubleshoot, advanced,
+  repair: () => startBoot(true),
+  device: () => show('Use a device', '<p class="intro">No bootable devices found.</p><p class="small">This simulation has no connected recovery devices.</p>', 'choose'),
+  reset: () => show('Reset this PC', `<div class="tiles">${tile('Keep my files', 'Removes apps and settings, but keeps your personal files', 'restore', 'resetPreview')}${tile('Remove everything', 'Removes all of your personal files, apps, and settings', 'drive', 'resetPreview')}</div>`, 'troubleshoot'),
+  resetPreview: () => show('Reset this PC', '<p class="intro">This is a preview of Windows Recovery.</p><p class="small">No files are changed and Windows is not reinstalled.</p>', 'reset'),
+  startup: () => show('Startup Settings', `<p class="intro">Restart to change Windows options such as:</p><div class="small">Enable low-resolution video mode<br>Enable debugging mode<br>Enable boot logging<br>Enable Safe Mode<br>Disable driver signature enforcement<br>Disable early-launch anti-malware protection<br>Disable automatic restart on system failure</div><div class="actions">${action('Restart', 'safeModes')}</div>`, 'advanced'),
+  safeModes: () => show('Startup Settings', `<p class="intro">Choose a startup option.</p><div class="actions">${action('Enable Safe Mode', 'restart')}${action('Safe Mode with Networking', 'restart')}${action('Continue to Windows 11', 'restart')}</div><p class="small">In this simulation, each startup option returns to the boot sequence.</p>`, 'startup'),
+  command: () => show('Command Prompt', '<div class="terminal">Microsoft Windows [Version 10.0.22631.3155]\n(c) Microsoft Corporation. All rights reserved.\n\nX:\\windows\\system32&gt; <span aria-hidden="true">▌</span>\n\nSimulated console — commands are not executed.</div>', 'advanced'),
+  updates: () => show('Uninstall Updates', `<div class="tiles">${tile('Uninstall latest quality update', '', 'uninstall', 'updatePreview')}${tile('Uninstall latest feature update', '', 'uninstall', 'updatePreview')}</div>`, 'advanced'),
+  updatePreview: () => show('Uninstall Updates', '<p class="intro">We ran into a problem and won’t be able to uninstall the update.</p><p class="small">No installed updates are changed by this simulation.</p>', 'updates'),
+  firmware: () => show('UEFI Firmware Settings', '<p class="intro">Restart to change UEFI firmware settings.</p><p class="small">Firmware settings are unavailable in this browser simulation.</p>', 'advanced'),
+  restore: () => show('System Restore', '<p class="intro">No restore points have been created on your computer’s system drive.</p><p class="small">This simulated recovery environment has no restore points available.</p>', 'advanced'),
+  off: () => { cancelTimers(); recovery.hidden = true; boot.hidden = true; skip.hidden = true; document.querySelector('meta[name="theme-color"]').content = '#000000'; reveal(); },
+};
+recovery.addEventListener('click', event => {
+  const button = event.target.closest('[data-action]');
+  if (button) routes[button.dataset.action]?.();
+});
+document.querySelector('#restart').onclick = () => startBoot();
+skip.onclick = failure;
+const fullscreen = document.querySelector('#fullscreen');
+if (!document.fullscreenEnabled) fullscreen.hidden = true;
+fullscreen.onclick = async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch { fullscreen.textContent = 'Fullscreen unavailable'; }
+};
+document.addEventListener('fullscreenchange', () => fullscreen.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen');
+let controlTimer;
+function reveal() { document.body.classList.add('controls-visible'); clearTimeout(controlTimer); controlTimer = setTimeout(() => document.body.classList.remove('controls-visible'), 2800); }
+document.addEventListener('pointermove', reveal);
+document.addEventListener('pointerdown', reveal);
+reveal(); startBoot();
+</script>
+</body>
+</html>

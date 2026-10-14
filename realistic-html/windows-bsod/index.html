@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0078d7">
+  <title>Windows Blue Screen — Simulation</title>
+  <style>
+    :root { color-scheme: dark; background: #0078d7; color: #fff; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      min-height: 100svh;
+      font-family: "Segoe UI", "Segoe UI Variable", "Helvetica Neue", Arial, sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+    main {
+      width: min(100%, 1100px);
+      padding: clamp(48px, 10vh, 110px) 48px 70px clamp(32px, 12.4vw, 190px);
+    }
+    .face {
+      margin: 0 0 24px -8px;
+      font-size: clamp(100px, 11vw, 160px);
+      line-height: 1.1;
+      font-weight: 300;
+      letter-spacing: -8px;
+    }
+    h1 {
+      max-width: 790px;
+      margin: 0;
+      font-size: clamp(21px, 2.15vw, 30px);
+      line-height: 1.45;
+      font-weight: 300;
+    }
+    .progress {
+      margin: 28px 0 0;
+      font-size: clamp(21px, 2.15vw, 30px);
+      line-height: 1.45;
+      font-variant-numeric: tabular-nums;
+    }
+    .details {
+      max-width: 760px;
+      margin-top: 58px;
+      font-size: clamp(13px, 1.1vw, 16px);
+      line-height: 1.65;
+    }
+    .details p { margin: 0; }
+    .controls {
+      position: fixed;
+      right: 20px;
+      bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      transition: opacity 180ms ease;
+      font-size: 12px;
+    }
+    .controls:hover, .controls:focus-within, body.show-controls .controls { opacity: 1; }
+    button {
+      border: 1px solid #ffffff80;
+      border-radius: 3px;
+      padding: 8px 12px;
+      background: #006abc;
+      color: white;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:hover { background: #005fa9; }
+    button:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+    @media (max-width: 600px) {
+      main { padding: 48px 28px 100px; }
+      .face { margin-bottom: 30px; }
+      .details { margin-top: 42px; }
+      .controls { right: 16px; bottom: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .controls { transition: none; } }
+  </style>
+</head>
+<body class="show-controls">
+  <main aria-label="Simulated Windows blue screen">
+    <div class="face" aria-hidden="true">:(</div>
+    <h1>Your PC ran into a problem and needs to restart. We’re just collecting some error info, and then we’ll restart for you.</h1>
+    <p class="progress"><span id="percent">0</span>% complete</p>
+    <div class="details">
+      <p>If you’d like to know more, you can search online later for this error:</p>
+      <p>CRITICAL_PROCESS_DIED</p>
+    </div>
+  </main>
+  <div class="controls" aria-label="Simulation controls">
+    <span>Simulation · Esc to exit fullscreen</span>
+    <button id="fullscreen" type="button">Enter fullscreen</button>
+  </div>
+  <script>
+    const percent = document.getElementById('percent');
+    const fullscreen = document.getElementById('fullscreen');
+    let progress = 0;
+    // Stop at 100%; this page never restarts or navigates the computer.
+    const timer = window.setInterval(() => {
+      progress = Math.min(100, progress + Math.floor(Math.random() * 4) + 1);
+      percent.textContent = progress;
+      if (progress === 100) window.clearInterval(timer);
+    }, 2400);
+    let hideControls;
+    function revealControls() {
+      document.body.classList.add('show-controls');
+      window.clearTimeout(hideControls);
+      hideControls = window.setTimeout(() => document.body.classList.remove('show-controls'), 2500);
+    }
+    document.addEventListener('pointermove', revealControls);
+    document.addEventListener('pointerdown', revealControls);
+    revealControls();
+    if (!document.fullscreenEnabled) fullscreen.hidden = true;
+    fullscreen.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch {
+        fullscreen.textContent = 'Fullscreen unavailable';
+      }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      fullscreen.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Enter fullscreen';
+      revealControls();
+    });
+  </script>
+</body>
+</html>

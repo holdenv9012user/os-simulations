@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>Windows 11 Recovery — Simulation</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body { background: #000; color: #fff; font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; }
+    [hidden] { display: none !important; }
+    .boot { position: relative; height: 100svh; min-height: 350px; }
+    .logo { position: absolute; top: 33%; left: 50%; transform: translate(-50%, -50%); display: grid; grid-template-columns: repeat(2, 48px); gap: 5px; }
+    .logo span { width: 48px; height: 48px; background: #00a2ed; }
+    .spinner { position: absolute; top: 65%; left: calc(50% - 15px); width: 30px; height: 30px; border: 3px solid #ffffff25; border-top-color: white; border-right-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .recovery { min-height: 100svh; background: #0078d7; padding: clamp(40px, 7.5vh, 85px) clamp(28px, 7.5vw, 115px) 85px; }
+    h1 { margin: 0 0 25px; font-size: clamp(48px, 5.3vw, 76px); line-height: 1.15; font-weight: 300; }
+    h2 { margin: 0 0 26px; font-size: clamp(24px, 2.65vw, 36px); line-height: 1.3; font-weight: 300; }
+    p { max-width: 1020px; margin: 0 0 26px; font-size: clamp(16px, 1.65vw, 22px); line-height: 1.45; }
+    .code { margin-top: 30px; margin-bottom: 32px; }
+    .options { margin-top: clamp(70px, 17vh, 180px); }
+    .options p { margin: 0 0 10px; font-size: clamp(15px, 1.4vw, 19px); }
+    .controls { position: fixed; right: 20px; bottom: 16px; display: flex; align-items: center; gap: 12px; opacity: 0; transition: opacity .15s; font-size: 12px; }
+    body.controls-visible .controls, .controls:hover, .controls:focus-within { opacity: 1; }
+    button { padding: 7px 12px; color: white; background: #005fa9; border: 1px solid #ffffff80; border-radius: 3px; font: inherit; cursor: pointer; }
+    button:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+    @media (max-width: 600px) { .options { margin-top: 65px; } .recovery { padding-bottom: 100px; } }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .controls { transition: none; } }
+  </style>
+</head>
+<body class="controls-visible">
+  <div class="boot" id="boot" aria-label="Simulated Windows boot">
+    <div class="logo" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="spinner" aria-hidden="true"></div>
+  </div>
+  <main class="recovery" id="recovery" hidden>
+    <h1>Recovery</h1>
+    <h2>Your PC/Device needs to be repaired</h2>
+    <p>The Boot Configuration Data file doesn't contain valid information for an operating system.</p>
+    <p class="code">File: \BCD<br>Error code: 0xc0000098</p>
+    <p>You'll need to use recovery tools. If you don't have any installation media (like a disc or USB device), contact your PC administrator or PC/Device manufacturer.</p>
+    <div class="options" aria-label="Decorative recovery options; this simulation stays on this screen">
+      <p>Press Enter to try again</p>
+      <p>Press F1 to enter Recovery Environment</p>
+      <p>Press F8 for Startup Settings</p>
+      <p>Press Esc for UEFI Firmware Settings</p>
+    </div>
+  </main>
+  <div class="controls"><span>Simulation · Static recovery screen</span><button id="fullscreen" type="button">Fullscreen</button></div>
+  <script>
+    // A momentary boot logo, then a permanent recovery screen.
+    window.setTimeout(() => {
+      document.getElementById('boot').hidden = true;
+      document.getElementById('recovery').hidden = false;
+      document.querySelector('meta[name="theme-color"]').content = '#0078d7';
+    }, 650);
+
+    const fullscreen = document.getElementById('fullscreen');
+    if (!document.fullscreenEnabled) fullscreen.hidden = true;
+    fullscreen.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch { fullscreen.textContent = 'Fullscreen unavailable'; }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      fullscreen.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+    });
+    let hideTimer;
+    function revealControls() {
+      document.body.classList.add('controls-visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => document.body.classList.remove('controls-visible'), 2200);
+    }
+    document.addEventListener('pointermove', revealControls);
+    document.addEventListener('pointerdown', revealControls);
+    revealControls();
+  </script>
+</body>
+</html>

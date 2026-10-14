@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows 11 Setup — Simulation</title>
+<style>
+* { box-sizing: border-box; }
+html,body { margin: 0; min-height: 100%; }
+body { background: #170d57; color: #222; font: 15px 'Segoe UI', Arial, sans-serif; }
+[hidden] { display: none !important; }
+main { min-height: 100svh; display: grid; place-items: center; padding: 30px 18px 80px; }
+.setup { width: min(790px, 100%); min-height: 530px; background: #fff; box-shadow: 0 16px 70px #0006; display: flex; flex-direction: column; }
+.titlebar { background: #f5f5f5; border-bottom: 1px solid #ddd; padding: 11px 17px; font-size: 13px; display: flex; align-items: center; gap: 9px; }
+.logo { width: 19px; height: 19px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.logo i { background: #0078d4; }
+.content { padding: 36px 48px; flex: 1; }
+h1 { color: #0067b8; font-weight: 300; font-size: 30px; margin: 0 0 25px; }
+p { line-height: 1.6; margin: 0 0 20px; }
+label { display: block; margin: 20px 0; }
+label span { display: block; margin-bottom: 8px; }
+select { width: min(100%, 350px); background: white; border: 1px solid #888; padding: 8px; font: inherit; color: #222; }
+.footer { border-top: 1px solid #ddd; background: #fafafa; padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+.footer small { color: #666; }
+button { font: inherit; cursor: pointer; padding: 7px 26px; border: 1px solid #888; background: #eee; color: #222; }
+button:hover { border-color: #0078d4; background: #e5f1fb; }
+button:focus-visible,select:focus-visible { outline: 2px solid #0078d4; outline-offset: 3px; }
+.primary { color: white; background: #0067b8; border-color: #0067b8; }
+.primary:hover { background: #005a9e; color: white; }
+.choice { display: block; width: 100%; text-align: left; padding: 20px; margin: 16px 0; background: white; border: 1px solid #bbb; }
+.choice strong { display: block; color: #0067b8; font-size: 18px; font-weight: 400; margin-bottom: 8px; }
+.choice small { line-height: 1.5; }
+.steps { list-style: none; padding: 0; line-height: 2.2; margin-top: 25px; }
+.steps li { color: #777; }
+.steps .done { color: #26752c; }
+.steps .active { color: #222; font-weight: 600; }
+progress { width: 100%; height: 21px; accent-color: #008b3a; margin-top: 8px; }
+.percent { font-size: 23px; font-weight: 300; margin: 18px 0 0; }
+dialog { width: min(470px, calc(100% - 36px)); padding: 0; border: 1px solid #888; color: #222; box-shadow: 0 12px 60px #0007; background: white; }
+dialog::backdrop { background: #0003; }
+.error-body { padding: 30px 24px; display: flex; align-items: center; gap: 18px; }
+.error-icon { flex: 0 0 33px; height: 33px; border-radius: 50%; background: #c42b1c; color: white; display: grid; place-items: center; font: 29px Arial, sans-serif; }
+.error-body p { margin: 0; }
+.dialog-footer { padding: 14px 22px; background: #f3f3f3; text-align: right; }
+.controls { position: fixed; bottom: 15px; right: 20px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: white; }
+.controls button { font-size: 12px; padding: 7px 12px; }
+@media(max-width: 600px) { .content { padding: 28px 24px; } h1 { font-size: 26px; } .footer { padding: 16px 24px; } }
+</style>
+</head>
+<body>
+<main>
+  <section class="setup" aria-label="Simulated Windows 11 Setup">
+    <div class="titlebar"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Windows 11 Setup</div>
+    <div class="content" id="content"></div>
+    <div class="footer"><small>Microsoft · Windows Setup</small><div id="actions"></div></div>
+  </section>
+</main>
+<dialog id="error" aria-labelledby="error-title" aria-describedby="error-message">
+  <div class="titlebar" id="error-title">Windows 11 Setup</div>
+  <div class="error-body"><span class="error-icon" aria-hidden="true">×</span><p id="error-message">The file 'cmd.exe' was unable to be made</p></div>
+  <div class="dialog-footer"><button id="okay" autofocus>OK</button></div>
+</dialog>
+<div class="controls"><span>Simulation</span><button id="fullscreen">Fullscreen</button></div>
+<script>
+const content = document.getElementById('content');
+const actions = document.getElementById('actions');
+const error = document.getElementById('error');
+let timer;
+function screen(html, buttons = '') {
+  content.innerHTML = html;
+  actions.innerHTML = buttons;
+  const heading = content.querySelector('h1');
+  heading.tabIndex = -1;
+  heading.focus({preventScroll:true});
+}
+function start() {
+  clearTimeout(timer);
+  if (error.open) error.close();
+  screen('<h1>Windows 11 Setup</h1><p>Select your language and other preferences, then click Next to continue.</p><label><span>Language to install</span><select><option>English (United States)</option></select></label><label><span>Time and currency format</span><select><option>English (United States)</option></select></label><label><span>Keyboard or input method</span><select><option>US</option></select></label>', '<button class="primary" data-action="ready">Next</button>');
+}
+function ready() {
+  screen('<h1>Install Windows 11</h1><p>Setup will guide you through installing Windows 11.</p><p>This preview uses a simulated drive.</p>', '<button data-action="start">Back</button> <button class="primary" data-action="type">Install now</button>');
+}
+function type() {
+  screen('<h1>Which type of installation do you want?</h1><button class="choice" data-action="install"><strong>Upgrade: Install Windows and keep files, settings, and applications</strong><small>Keep your files and applications in the simulated installation.</small></button><button class="choice" data-action="install"><strong>Custom: Install Windows only (advanced)</strong><small>Install a new copy of Windows on the simulated drive.</small></button>', '<button data-action="ready">Back</button>');
+}
+function install() {
+  screen('<h1>Installing Windows 11</h1><p>Your PC will restart several times. This might take a while.</p><p class="percent"><span id="percent">0</span>% complete</p><progress id="progress" value="0" max="100" aria-label="Installation progress"></progress><ul class="steps"><li class="active" id="copy">Copying Windows files</li><li id="prepare">Getting files ready for installation</li><li>Installing features</li><li>Installing updates</li><li>Finishing up</li></ul>');
+  let percent = 0;
+  function advance() {
+    percent = Math.min(45, percent + 3);
+    document.getElementById('percent').textContent = percent;
+    document.getElementById('progress').value = percent;
+    if (percent >= 9) {
+      document.getElementById('copy').className = 'done';
+      document.getElementById('copy').textContent = '✓ Copying Windows files';
+      document.getElementById('prepare').className = 'active';
+    }
+    if (percent === 45) {
+      timer = setTimeout(() => error.showModal(), 450);
+    } else timer = setTimeout(advance, 650);
+  }
+  timer = setTimeout(advance, 800);
+}
+const routes = {start, ready, type, install};
+document.querySelector('.setup').addEventListener('click', event => {
+  const button = event.target.closest('[data-action]');
+  if (button) routes[button.dataset.action]();
+});
+document.getElementById('okay').addEventListener('click', start);
+error.addEventListener('cancel', event => event.preventDefault());
+const fullscreen = document.getElementById('fullscreen');
+if (!document.fullscreenEnabled) fullscreen.hidden = true;
+fullscreen.addEventListener('click', async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch { fullscreen.textContent = 'Fullscreen unavailable'; }
+});
+document.addEventListener('fullscreenchange', () => fullscreen.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen');
+start();
+</script>
+</body>
+</html>
