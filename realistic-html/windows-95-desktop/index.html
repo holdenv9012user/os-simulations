@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows 95 — Desktop Simulation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<section id="bios" class="screen"><pre id="post">AWARD MODULAR BIOS v4.51PG
+Copyright (C) 1984-1995, Award Software, Inc.
+
+Pentium-S CPU at 100MHz
+
+Memory Test : <span id="memory">0</span>K OK
+</pre></section>
+<section id="splash" class="screen" hidden>
+  <div class="clouds"></div>
+  <div class="splash-brand"><div class="flying-flag" aria-hidden="true"><i></i><i></i><i></i><i></i></div><p>Microsoft<span class="registered">®</span></p><h1>Windows<span>95</span></h1><small>Microsoft Corporation</small></div>
+  <div class="loading-band"></div>
+</section>
+<main id="desktop" class="screen" hidden aria-label="Windows 95 desktop">
+  <div class="desktop-icons">
+    <button class="desktop-icon" data-open="computer"><span class="pixel-icon monitor" aria-hidden="true"></span><span>My Computer</span></button>
+    <button class="desktop-icon" data-open="network"><span class="pixel-icon network" aria-hidden="true">▦</span><span>Network<br>Neighborhood</span></button>
+    <button class="desktop-icon" data-open="recycle"><span class="pixel-icon bin" aria-hidden="true">♻</span><span>Recycle Bin</span></button>
+  </div>
+  <div id="windows"></div>
+  <nav id="start-menu" class="raised" aria-label="Start menu" hidden>
+    <div class="sidebar">Windows<span>95</span></div>
+    <div class="menu-items">
+      <button data-open="programs"><span>▤</span>Programs<b>▶</b></button>
+      <button data-open="documents"><span>▱</span>Documents<b>▶</b></button>
+      <button data-open="settings"><span>⚙</span>Settings<b>▶</b></button>
+      <button data-open="find"><span>⌕</span>Find<b>▶</b></button>
+      <button data-open="help"><span>?</span>Help</button>
+      <button data-open="run"><span>▣</span>Run…</button>
+      <hr><button id="shutdown"><span>⏻</span>Shut Down…</button>
+    </div>
+  </nav>
+  <footer class="taskbar raised"><button id="start" class="raised" aria-expanded="false"><span class="tiny-flag" aria-hidden="true">▦</span><b>Start</b></button><div id="tasks"></div><div class="tray inset"><span aria-hidden="true">◖))</span><time id="clock"></time></div></footer>
+</main>
+<section id="off" class="screen" hidden><p>It is now safe to turn off<br>your computer.</p><button id="power-on">Power on</button></section>
+<dialog id="shutdown-dialog" class="raised"><form method="dialog"><div class="titlebar">Shut Down Windows<button value="cancel" aria-label="Close">×</button></div><div class="shutdown-body"><span class="shutdown-symbol" aria-hidden="true">◈</span><div><p>What do you want the computer to do?</p><label><input type="radio" name="power" value="off" checked> Shut down the computer?</label><label><input type="radio" name="power" value="restart"> Restart the computer?</label></div></div><div class="dialog-actions"><button class="raised" value="okay">Yes</button><button class="raised" value="cancel">No</button></div></form></dialog>
+<div id="boot-controls"><span>Simulation</span><button id="skip">Skip boot</button></div>
+<script src="script.js"></script>
+</body>
+</html>
