@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows 95 — Standalone Desktop v2</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{font:13px Arial,sans-serif;color:#000;background:#000}button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border-radius:0}button:focus-visible{outline:1px dotted #000;outline-offset:-5px}[hidden]{display:none!important}.screen{position:fixed;inset:0}.raised{background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:inset -1px -1px #808080}.inset{border:2px solid;border-color:#808080 #fff #fff #808080}button:active{box-shadow:inset 1px 1px #404040}#bios{padding:18px;color:#aaa;font:clamp(13px,1.7vw,22px)/1.3 'Courier New',monospace}#bios pre{margin:0;white-space:pre-wrap;font:inherit}#splash{background:linear-gradient(#67a0d4,#d0e7ef 70%,#7daed1);display:grid;place-items:center;overflow:hidden}.clouds{position:absolute;inset:0;background:radial-gradient(ellipse at 12% 25%,#fff9 0%,transparent 30%),radial-gradient(ellipse at 70% 80%,#fffd 0%,transparent 28%),radial-gradient(ellipse at 90% 15%,#fff9 0%,transparent 25%),radial-gradient(ellipse at 35% 65%,#fff9,transparent 35%);filter:blur(15px)}.splash-brand{position:relative;transform:translateY(-20px);text-shadow:1px 2px #fff6}.splash-brand p{font-size:clamp(24px,4vw,42px);margin:20px 0 0 8px;letter-spacing:-2px}.registered{font-size:16px;vertical-align:top}.splash-brand h1{font-size:clamp(55px,10vw,106px);font-weight:800;letter-spacing:-6px;margin:-5px 0 0}.splash-brand h1 span{font-weight:300}.splash-brand small{display:block;text-align:right;font-size:16px;margin-top:32px}.flying-flag{width:175px;height:145px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#080808;padding:9px;transform:perspective(400px) rotateY(-17deg) rotate(12deg);box-shadow:-15px 8px #0008,-30px 15px #0003}.flying-flag i:nth-child(1){background:#f14726}.flying-flag i:nth-child(2){background:#54a825}.flying-flag i:nth-child(3){background:#225ad0}.flying-flag i:nth-child(4){background:#ffce25}.loading-band{position:absolute;bottom:0;left:0;right:0;height:22px;background:repeating-linear-gradient(90deg,#034bb0 0,#034bb0 20px,#84b2ea 45px,#034bb0 75px);background-size:150px 100%;animation:load 1s linear infinite}@keyframes load{to{background-position:150px 0}}#desktop{background:#008080}.desktop-icons{position:absolute;top:16px;left:8px;display:grid;gap:21px;width:90px}.desktop-icon{display:flex;align-items:center;flex-direction:column;gap:8px;background:none;border:1px solid transparent;color:white;padding:5px 0;text-align:center;line-height:1.2;font-size:12px}.desktop-icon:focus{background:#00008055;border:1px dotted #fff;outline:none}.pixel-icon{display:block;position:relative;width:36px;height:34px}.monitor{background:#c0c0c0;border:2px solid;border-color:#fff #333 #333 #fff;width:35px;height:28px;margin-bottom:6px;box-shadow:3px 3px #004040}.monitor:before{content:'';position:absolute;inset:3px;background:#000080;border:2px inset #ddd}.monitor:after{content:'';position:absolute;width:29px;height:6px;left:1px;bottom:-8px;background:#c0c0c0;border:2px outset #fff}.network{font:bold 39px/34px Arial;color:#d5d5d5;text-shadow:2px 2px #000080}.bin{width:28px;border:2px solid;border-color:white #666 #666 white;background:#ccc;color:#006060;font:27px/30px Arial;box-shadow:2px 2px #004040}.taskbar{position:absolute;bottom:0;left:0;right:0;height:38px;padding:3px;display:flex;gap:5px;z-index:10000}#start{display:flex;align-items:center;gap:4px;padding:1px 6px;font-size:15px}#start[aria-expanded=true]{border-color:#404040 #fff #fff #404040;background:#ddd}.tiny-flag{color:#003d91;font-size:23px;text-shadow:2px 1px #c34220}#tasks{display:flex;gap:4px;flex:1;min-width:0}.task{min-width:0;width:160px;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 8px}.task.active{font-weight:bold;background:#dedede;border-color:#404040 #fff #fff #404040}.tray{padding:3px 8px;display:flex;gap:12px;align-items:center;font-size:12px;white-space:nowrap}#start-menu{position:absolute;bottom:37px;left:2px;width:230px;z-index:10001;display:flex;padding:2px}.sidebar{writing-mode:vertical-rl;transform:rotate(180deg);font-size:24px;font-weight:bold;color:#c0c0c0;background:#808080;padding:10px 4px}.sidebar span{color:white;font-weight:400}.menu-items{flex:1}.menu-items button{width:100%;border:0;background:none;display:flex;align-items:center;gap:12px;padding:12px 9px;text-align:left}.menu-items button:hover,.menu-items button:focus-visible{background:#000080;color:white}.menu-items button>span{width:24px;font-size:23px}.menu-items b{margin-left:auto;font-size:10px}.menu-items hr{border:0;border-top:1px solid #808080;border-bottom:1px solid white;margin:3px}.window{position:absolute;display:flex;flex-direction:column;width:min(560px,calc(100vw - 24px));height:min(360px,calc(100svh - 70px));min-height:200px;padding:2px}.titlebar{background:#808080;color:white;display:flex;align-items:center;gap:3px;height:25px;padding:3px 3px 3px 6px;font-weight:bold;touch-action:none;user-select:none;flex-shrink:0}.window.active .titlebar,dialog .titlebar{background:#000080}.titlebar .title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.titlebar button{width:21px;height:19px;line-height:13px;padding:0;color:black;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;font-weight:bold}.menubar{padding:6px;word-spacing:14px;border-bottom:1px solid #888}.window-content{background:white;flex:1;min-height:0;overflow:auto;margin:2px;padding:15px;border:2px solid;border-color:#808080 #fff #fff #808080}.statusbar{padding:3px 6px;border:1px solid;border-color:#808080 #fff #fff #808080;font-size:12px}.items{display:flex;flex-wrap:wrap;gap:16px;align-content:flex-start}.file-icon{border:1px solid transparent;background:white;width:95px;padding:8px 2px;display:flex;align-items:center;flex-direction:column;gap:10px;text-align:center}.file-icon:hover,.file-icon:focus-visible{background:#000080;color:white}.file-glyph{font-size:29px;color:#797979;text-shadow:1px 1px silver}.window-content p{line-height:1.5}.window-content textarea{width:100%;height:100%;min-height:160px;border:none;resize:none;outline:none;font:15px 'Courier New',monospace}.run-row{display:flex;gap:10px;align-items:center}.run-row input{width:100%;padding:5px}.run-submit{margin-top:16px;padding:6px 25px}.window.maximized{left:0!important;top:0!important;width:100%!important;height:calc(100svh - 38px)!important}.shutdown-body{display:flex;gap:25px;padding:20px}.shutdown-body p{margin-top:0}.shutdown-body label{display:block;margin:12px 0}.shutdown-symbol{font-size:43px;color:#004a80}.dialog-actions{display:flex;gap:8px;justify-content:flex-end;padding:0 20px 18px}.dialog-actions button{min-width:75px;padding:5px}dialog{width:min(420px,calc(100% - 30px));padding:3px}dialog::backdrop{background:#0005}dialog .titlebar{justify-content:space-between}#off{display:grid;place-content:center;text-align:center;color:#dd8e20;font:bold clamp(20px,3vw,34px)/1.4 Arial;background:black}#power-on{margin:40px auto 0;background:none;color:#aaa;border:1px solid #555;padding:8px 20px;font-size:12px;opacity:0}#off:hover #power-on,#power-on:focus-visible{opacity:1}#boot-controls{position:fixed;bottom:28px;right:20px;display:flex;gap:10px;align-items:center;color:white;font:12px Arial;z-index:20000}#boot-controls button{background:#222;color:white;border:1px solid #888;padding:7px 12px}@media(max-width:500px){.tray{padding:3px}.tray>span{display:none}.window{height:330px}.splash-brand h1{letter-spacing:-3px}}@media(prefers-reduced-motion:reduce){.loading-band{animation:none}}
+
+</style>
+</head>
+<body>
+<noscript><div style="position:fixed;inset:0;z-index:30000;background:#000;color:#fff;padding:30px;font:16px Arial">JavaScript is disabled in this viewer. Open this downloaded HTML file directly in a web browser to run the simulation.</div></noscript>
+<section id="bios" class="screen"><pre id="post">AWARD MODULAR BIOS v4.51PG
+Copyright (C) 1984-1995, Award Software, Inc.
+
+Pentium-S CPU at 100MHz
+
+Memory Test : <span id="memory">0</span>K OK
+</pre></section>
+<section id="splash" class="screen" hidden>
+  <div class="clouds"></div>
+  <div class="splash-brand"><div class="flying-flag" aria-hidden="true"><i></i><i></i><i></i><i></i></div><p>Microsoft<span class="registered">®</span></p><h1>Windows<span>95</span></h1><small>Microsoft Corporation</small></div>
+  <div class="loading-band"></div>
+</section>
+<main id="desktop" class="screen" hidden aria-label="Windows 95 desktop">
+  <div class="desktop-icons">
+    <button class="desktop-icon" data-open="computer"><span class="pixel-icon monitor" aria-hidden="true"></span><span>My Computer</span></button>
+    <button class="desktop-icon" data-open="network"><span class="pixel-icon network" aria-hidden="true">▦</span><span>Network<br>Neighborhood</span></button>
+    <button class="desktop-icon" data-open="recycle"><span class="pixel-icon bin" aria-hidden="true">♻</span><span>Recycle Bin</span></button>
+  </div>
+  <div id="windows"></div>
+  <nav id="start-menu" class="raised" aria-label="Start menu" hidden>
+    <div class="sidebar">Windows<span>95</span></div>
+    <div class="menu-items">
+      <button data-open="programs"><span>▤</span>Programs<b>▶</b></button>
+      <button data-open="documents"><span>▱</span>Documents<b>▶</b></button>
+      <button data-open="settings"><span>⚙</span>Settings<b>▶</b></button>
+      <button data-open="find"><span>⌕</span>Find<b>▶</b></button>
+      <button data-open="help"><span>?</span>Help</button>
+      <button data-open="run"><span>▣</span>Run…</button>
+      <hr><button id="shutdown"><span>⏻</span>Shut Down…</button>
+    </div>
+  </nav>
+  <footer class="taskbar raised"><button id="start" class="raised" aria-expanded="false"><span class="tiny-flag" aria-hidden="true">▦</span><b>Start</b></button><div id="tasks"></div><div class="tray inset"><span aria-hidden="true">◖))</span><time id="clock"></time></div></footer>
+</main>
+<section id="off" class="screen" hidden><p>It is now safe to turn off<br>your computer.</p><button id="power-on">Power on</button></section>
+<dialog id="shutdown-dialog" class="raised"><form method="dialog"><div class="titlebar">Shut Down Windows<button value="cancel" aria-label="Close">×</button></div><div class="shutdown-body"><span class="shutdown-symbol" aria-hidden="true">◈</span><div><p>What do you want the computer to do?</p><label><input type="radio" name="power" value="off" checked> Shut down the computer?</label><label><input type="radio" name="power" value="restart"> Restart the computer?</label></div></div><div class="dialog-actions"><button class="raised" value="okay">Yes</button><button class="raised" value="cancel">No</button></div></form></dialog>
+<div id="boot-controls"><span>Simulation · standalone v2</span><button id="skip">Skip boot</button></div>
+<script>
+const $ = id => document.getElementById(id);
+let timers = [], highest = 10, activeId = null;
+const opened = new Map();
+function later(delay, fn) { timers.push(setTimeout(fn, delay)); }
+function cancelBoot() { timers.forEach(clearTimeout); timers = []; }
+function menu(open) { $('start-menu').hidden = !open; $('start').setAttribute('aria-expanded', String(open)); }
+function desktop() {
+  cancelBoot(); $('bios').hidden = true; $('splash').hidden = true; $('off').hidden = true;
+  $('desktop').hidden = false; $('boot-controls').hidden = true; $('start').focus();
+}
+function boot() {
+  cancelBoot(); opened.clear(); $('windows').replaceChildren(); $('tasks').replaceChildren(); activeId = null; highest = 10;
+  menu(false); $('desktop').hidden = true; $('off').hidden = true; $('bios').hidden = false;
+  $('splash').hidden = true; $('boot-controls').hidden = false; $('memory').textContent = '0';
+  const old = $('bios-extra'); if (old) old.remove();
+  [8192,16384,24576,32768].forEach((n,i) => later(250 + i*250, () => $('memory').textContent = n));
+  later(1300, () => { const text = document.createElement('span'); text.id='bios-extra'; text.textContent='\nDetecting Primary Master ... IDE HARD DISK\n\nStarting Windows 95...'; $('post').append(text); });
+  later(2300, () => { $('bios').hidden = true; $('splash').hidden = false; });
+  later(5700, desktop);
+}
+function focusWindow(id) {
+  const entry = opened.get(id); if (!entry) return;
+  activeId = id; entry.win.hidden = false; entry.win.style.zIndex = ++highest;
+  for (const [key, item] of opened) { item.win.classList.toggle('active',key===id); item.task.classList.toggle('active',key===id); }
+}
+function focusRemaining() {
+  activeId = null;
+  const visible = [...opened].filter(([,entry]) => !entry.win.hidden).sort((a,b) => Number(b[1].win.style.zIndex)-Number(a[1].win.style.zIndex));
+  if (visible.length) focusWindow(visible[0][0]);
+}
+function file(label, target, glyph='▰') { return `<button class="file-icon" data-open="${target}"><span class="file-glyph" aria-hidden="true">${glyph}</span>${label}</button>`; }
+const pages = {
+  computer: ['My Computer', `<div class="items">${file('3½ Floppy (A:)','floppy')}${file('(C:)','drive')}${file('Control Panel','settings','⚙')}${file('Printers','printers','▤')}</div>`, '4 object(s)'],
+  drive: ['(C:)', `<div class="items">${file('Windows','windowsFolder','📁')}${file('My Documents','documents','📁')}${file('Program Files','programs','📁')}</div>`, '3 object(s)'],
+  windowsFolder: ['Windows', `<div class="items">${file('Notepad','notepad','▤')}${file('Read Me','readme','▱')}</div>`, '2 object(s)'],
+  network: ['Network Neighborhood', '<p>No other computers were found on this network.</p>', '0 object(s)'],
+  recycle: ['Recycle Bin', '', '0 object(s)'],
+  floppy: ['3½ Floppy (A:)', '<p>The device is not ready.</p><p>There is no disk in this simulated drive.</p>', 'Drive A:'],
+  printers: ['Printers', '<p>No printers are installed.</p>', '0 object(s)'],
+  documents: ['My Documents', `<div class="items">${file('Read Me.txt','readme','▱')}</div>`, '1 object(s)'],
+  programs: ['Programs', `<div class="items">${file('Notepad','notepad','▤')}${file('MS-DOS Prompt','dos','▣')}</div>`, '2 object(s)'],
+  settings: ['Control Panel', '<h3>Display properties</h3><p>Choose a desktop color:</p><button class="raised run-submit" data-color="#008080">Teal</button> <button class="raised run-submit" data-color="#3a6ea5">Blue</button> <button class="raised run-submit" data-color="#556b2f">Olive</button>', 'Personalize this simulation'],
+  find: ['Find', '<p>This simulated computer has a small collection of sample programs.</p><p>Open Programs to try Notepad or the MS-DOS Prompt.</p><button class="raised run-submit" data-open="programs">Open Programs</button>', 'Local simulation'],
+  help: ['Windows Help', '<h3>Welcome to Windows 95</h3><p>Double-click a desktop icon to open it. On touch screens, tap once. You can also focus an icon and press Enter.</p><p>Drag a window by its title bar. Use the title-bar buttons to minimize, maximize, or close it. Click its taskbar button to restore it.</p><p>Choose Start → Shut Down to finish. Everything here runs inside this page.</p>', 'Windows Help'],
+  readme: ['Read Me.txt', '<h3>Welcome to your simulated PC!</h3><p>This Windows 95-inspired desktop is made entirely with HTML, CSS, and JavaScript.</p><p>Explore My Computer, type in Notepad, or change the desktop color in Control Panel. Changes last only for this session.</p>', 'Read Me'],
+  notepad: ['Untitled - Notepad', '<textarea aria-label="Notepad document" spellcheck="false" placeholder=""></textarea>', 'Text is kept while this window is open'],
+  dos: ['MS-DOS Prompt', '<pre>Microsoft(R) Windows 95\n   (C)Copyright Microsoft Corp 1981-1995.\n\nC:\\WINDOWS&gt;_</pre><p>Display-only command prompt.</p>', 'MS-DOS simulation'],
+  run: ['Run', '<p>Type the name of a program, and Windows will open it for you.</p><form id="run-form"><label class="run-row">Open: <input name="command" autocomplete="off" aria-label="Program name"></label><button class="raised run-submit">OK</button><p id="run-message">Try notepad, explorer, control, or command.</p></form>', 'Run a simulated program']
+};
+function openWindow(id) {
+  menu(false); if (!pages[id]) return; if (opened.has(id)) { focusWindow(id); return; }
+  const [title, html, status] = pages[id];
+  const win = document.createElement('section'); win.className='window raised'; win.setAttribute('aria-label',title);
+  const offset = opened.size * 24;
+  win.style.left = Math.min(125+offset,Math.max(12,innerWidth-580))+'px';
+  win.style.top = Math.min(55+offset,Math.max(12,innerHeight-420))+'px';
+  win.innerHTML=`<div class="titlebar"><span class="title">${title}</span><button data-window="minimize" aria-label="Minimize">_</button><button data-window="maximize" aria-label="Maximize">□</button><button data-window="close" aria-label="Close">×</button></div><div class="menubar" aria-hidden="true">File Edit View Help</div><div class="window-content">${html}</div><div class="statusbar">${status}</div>`;
+  const task=document.createElement('button'); task.className='task raised'; task.textContent=title;
+  $('windows').append(win); $('tasks').append(task); opened.set(id,{win,task}); focusWindow(id);
+  win.addEventListener('pointerdown',()=>focusWindow(id));
+  task.addEventListener('click',()=>{ if(activeId===id&&!win.hidden){win.hidden=true;task.classList.remove('active');focusRemaining();}else focusWindow(id); });
+  win.addEventListener('click',event=>{
+    const action=event.target.closest('[data-window]')?.dataset.window;
+    if(action==='close'){win.remove();task.remove();opened.delete(id);focusRemaining();}
+    if(action==='minimize'){win.hidden=true;task.classList.remove('active');focusRemaining();}
+    if(action==='maximize'){win.classList.toggle('maximized');event.target.setAttribute('aria-label',win.classList.contains('maximized')?'Restore':'Maximize');}
+  });
+  const bar=win.querySelector('.titlebar'); let drag=null;
+  bar.addEventListener('pointerdown',event=>{
+    if(event.target.closest('button')||win.classList.contains('maximized'))return;
+    const rect=win.getBoundingClientRect();drag={x:event.clientX-rect.left,y:event.clientY-rect.top};bar.setPointerCapture(event.pointerId);
+  });
+  bar.addEventListener('pointermove',event=>{if(!drag)return;win.style.left=Math.max(0,Math.min(innerWidth-win.offsetWidth,event.clientX-drag.x))+'px';win.style.top=Math.max(0,Math.min(innerHeight-70,event.clientY-drag.y))+'px';});
+  bar.addEventListener('pointerup',()=>drag=null);bar.addEventListener('pointercancel',()=>drag=null);
+  bar.addEventListener('dblclick',event=>{if(!event.target.closest('button'))win.classList.toggle('maximized');});
+  if(id==='run')win.querySelector('form').addEventListener('submit',event=>{
+    event.preventDefault();const command=new FormData(event.target).get('command').trim().toLowerCase().replace(/\.exe$/,'');
+    const target={notepad:'notepad',explorer:'computer',control:'settings',command:'dos'}[command];
+    if(target)openWindow(target);else $('run-message').textContent='Cannot find that program. Try notepad, explorer, control, or command.';
+  });
+}
+document.addEventListener('click',event=>{
+  const target=event.target.closest('[data-open]');
+  if(target&&!target.classList.contains('desktop-icon'))openWindow(target.dataset.open);
+  const color=event.target.closest('[data-color]');if(color)$('desktop').style.background=color.dataset.color;
+  if(!event.target.closest('#start-menu')&&!event.target.closest('#start'))menu(false);
+});
+document.querySelectorAll('.desktop-icon').forEach(icon=>{
+  icon.addEventListener('dblclick',()=>openWindow(icon.dataset.open));
+  icon.addEventListener('click',event=>{if(event.detail===0)openWindow(icon.dataset.open);});
+  icon.addEventListener('pointerup',event=>{if(event.pointerType==='touch')openWindow(icon.dataset.open);});
+});
+$('start').addEventListener('click',()=>menu($('start-menu').hidden));
+document.addEventListener('keydown',event=>{if(event.key==='Escape')menu(false);});
+$('shutdown').addEventListener('click',()=>{menu(false);$('shutdown-dialog').returnValue='cancel';$('shutdown-dialog').showModal();});
+$('shutdown-dialog').addEventListener('close',()=>{
+  if($('shutdown-dialog').returnValue!=='okay')return;
+  if(document.querySelector('input[name="power"]:checked').value==='restart'){boot();return;}
+  $('desktop').hidden=true;$('off').hidden=false;$('power-on').focus({preventScroll:true});$('power-on').blur();
+});
+$('skip').addEventListener('click',desktop);$('power-on').addEventListener('click',boot);
+function clock(){ $('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+clock();setInterval(clock,1000);boot();
+
+</script>
+</body>
+</html>
